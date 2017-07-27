@@ -36,6 +36,7 @@ class JWT_AUTH_Options {
             'version' => 1,
             'aud' => '',
             'secret' => '',
+            'secret_algorithm' => 'HS256',
             'user_property' => 'id',
             'jwt_attribute' => 'sub',
             'secret_base64_encoded' => false,

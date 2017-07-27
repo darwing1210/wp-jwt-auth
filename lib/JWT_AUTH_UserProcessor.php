@@ -22,15 +22,17 @@ class JWT_AUTH_UserProcessor {
     	return $wp_json_basic_auth_error;
     }
 
-    protected static function getAuthorizationHeader() {
+protected static function getAuthorizationHeader() {
         $authorization = false;
 
         if (function_exists('getallheaders'))
         {
             $headers = getallheaders();
-
             if (isset($headers['Authorization'])) {
                 $authorization = $headers['Authorization'];
+            }
+            if ( ! $authorization && isset($headers['authorization'])) {
+                $authorization = $headers['authorization'];
             }
         }
         elseif (isset($_SERVER["Authorization"])){
@@ -60,7 +62,6 @@ class JWT_AUTH_UserProcessor {
         global $wp_json_basic_auth_error;
 
 	      $wp_json_basic_auth_error = null;
-
         $authorization = self::getAuthorizationHeader();
 
         $authorization = str_replace('Bearer ', '', $authorization);
@@ -105,20 +106,26 @@ class JWT_AUTH_UserProcessor {
         $aud = JWT_AUTH_Options::get( 'aud' );
         $secret = JWT_AUTH_Options::get( 'secret' );
         $secret_base64_encoded = JWT_AUTH_Options::get( 'secret_base64_encoded' );
+        $secret_type = JWT_AUTH_Options::get( 'signing_algorithm' );
+        
 
         if ($secret_base64_encoded) {
             $secret = base64_decode(strtr($secret, '-_', '+/'));
         }
 
         try {
+           
             // Decode the user
-            $decodedToken = \JWT::decode($encUser, $secret, ['HS256']);
+            $decodedToken = \JWT::decode($encUser, $secret, array($secret_type));
 
             // validate that this JWT was made for us
             if ($decodedToken->aud != $aud) {
+
                 throw new Exception("This token is not intended for us.");
             }
+
         } catch(\UnexpectedValueException $e) {
+
             throw new Exception($e->getMessage());
         }
 
