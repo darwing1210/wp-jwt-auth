@@ -90,7 +90,6 @@ class JWT_AUTH_Admin{
         echo    '<option value="HS256" '.($v === "HS256" ? 'selected' : '').'>HS256</option>';
         echo    '<option value="RS256" '.($v === "RS256" ? 'selected' : '').'>RS256</option>';
         echo '</select>';
-
     }
     public static function render_user_property(){
         $v = JWT_AUTH_Options::get( 'user_property' );

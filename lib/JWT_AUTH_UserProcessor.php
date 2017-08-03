@@ -22,7 +22,7 @@ class JWT_AUTH_UserProcessor {
     	return $wp_json_basic_auth_error;
     }
 
-protected static function getAuthorizationHeader() {
+    protected static function getAuthorizationHeader() {
         $authorization = false;
 
         if (function_exists('getallheaders'))
@@ -108,24 +108,18 @@ protected static function getAuthorizationHeader() {
         $secret_base64_encoded = JWT_AUTH_Options::get( 'secret_base64_encoded' );
         $secret_type = JWT_AUTH_Options::get( 'signing_algorithm' );
         
-
         if ($secret_base64_encoded) {
             $secret = base64_decode(strtr($secret, '-_', '+/'));
         }
-
         try {
-           
             // Decode the user
             $decodedToken = \JWT::decode($encUser, $secret, array($secret_type));
-
+            
             // validate that this JWT was made for us
             if ($decodedToken->aud != $aud) {
-
                 throw new Exception("This token is not intended for us.");
             }
-
         } catch(\UnexpectedValueException $e) {
-
             throw new Exception($e->getMessage());
         }
 
