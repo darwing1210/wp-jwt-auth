@@ -90,7 +90,7 @@ class JWT_AUTH_Admin{
      public static function render_domain(){
         $v = JWT_AUTH_Options::get( 'domain' );
         echo '<input type="text" name="' . JWT_AUTH_Options::OPTIONS_NAME . '[domain]" value="' . esc_attr( $v ) . '" id="jwt_auth_domain"/>';
-        echo '<br/><span class="description">' . __('Domain (issuer) of the JWT.', JWT_AUTH_LANG) . '</span>';
+        echo '<br/><span class="description">' . __('Domain (issuer) of the JWT. Not necessary for HS256 signing.', JWT_AUTH_LANG) . '</span>';
     }
     public static function render_user_property(){
         $v = JWT_AUTH_Options::get( 'user_property' );
