@@ -52,6 +52,7 @@ class JWT_AUTH_Admin{
             array('id' => 'jwt_auth_secret', 'name' => 'Secret', 'function' => 'render_secret'),
             array('id' => 'jwt_auth_secret_base64_encoded', 'name' => 'Base64 Secret encoded', 'function' => 'render_secret_base64_encoded'),
             array('id' => 'jwt_auth_signing_algorithm', 'name' => 'Signing algorithm', 'function' => 'render_signing_algorithm'),
+            array('id' => 'jwt_auth_domain', 'name' => 'domain', 'function' => 'render_domain'),
             array('id' => 'jwt_auth_user_property', 'name' => 'User Property', 'function' => 'render_user_property'),
             array('id' => 'jwt_auth_jwt_attribute', 'name' => 'JWT Attribute', 'function' => 'render_jwt_attribute'),
 
@@ -68,12 +69,7 @@ class JWT_AUTH_Admin{
     }
     public static function render_secret(){
         $v = JWT_AUTH_Options::get( 'secret' );
-        //textarea needed to format cert correctly
-        if (JWT_AUTH_Options::get( 'signing_algorithm' ) == "RS256") {
-        echo '<textarea name="' . JWT_AUTH_Options::OPTIONS_NAME . '[secret]" id="jwt_auth_secret">' . esc_attr( $v ) . '</textarea>';
-        }else{
-        echo '<input type="text" name="' . JWT_AUTH_Options::OPTIONS_NAME . '[secret]" id="jwt_auth_secret" value="' . esc_attr( $v ) . '"/>';
-        }
+        echo '<input type="text" name="' . JWT_AUTH_Options::OPTIONS_NAME . '[secret]" value="' . esc_attr( $v ) . '" id="jwt_auth_secret"/>';
         echo '<br/><span class="description">' . __('Secret value to verify the JWT signature.', JWT_AUTH_LANG) . '</span>';
     }
     public static function render_secret_base64_encoded(){
@@ -90,6 +86,11 @@ class JWT_AUTH_Admin{
         echo    '<option value="HS256" '.($v === "HS256" ? 'selected' : '').'>HS256</option>';
         echo    '<option value="RS256" '.($v === "RS256" ? 'selected' : '').'>RS256</option>';
         echo '</select>';
+    }
+     public static function render_domain(){
+        $v = JWT_AUTH_Options::get( 'domain' );
+        echo '<input type="text" name="' . JWT_AUTH_Options::OPTIONS_NAME . '[domain]" value="' . esc_attr( $v ) . '" id="jwt_auth_domain"/>';
+        echo '<br/><span class="description">' . __('Domain (issuer) of the JWT.', JWT_AUTH_LANG) . '</span>';
     }
     public static function render_user_property(){
         $v = JWT_AUTH_Options::get( 'user_property' );

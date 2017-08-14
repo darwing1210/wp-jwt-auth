@@ -96,6 +96,44 @@ class JWT_AUTH_UserProcessor {
         return $user;
     }
 
+  public static function JWKfetch($domain){
+
+        global $wp_json_basic_auth_error;
+        $wp_json_basic_auth_error = null;
+
+        $endpoint = "https://$domain/.well-known/jwks.json";
+
+        $secret = [];
+
+         $response = wp_remote_get( $endpoint, array() );
+
+            if ( $response instanceof WP_Error ) {
+                $wp_json_basic_auth_error = $response->get_error_message();
+                error_log( $response->get_error_message() );
+                return false;
+            }
+
+            if ( $response['response']['code'] != 200 ) {
+                $wp_json_basic_auth_error = $response['body'];
+                error_log( $response['body'] );
+                return false;
+            }
+
+            if ( $response['response']['code'] >= 300 ) return false;           
+
+            $jwks = json_decode($response['body'], true);
+            
+            foreach ($jwks['keys'] as $key) { 
+                $secret[$key['kid']] = self::convertCertToPem($key['x5c'][0]);
+            }
+         return $secret;
+    }
+  protected function convertCertToPem($cert) {
+      return '-----BEGIN CERTIFICATE-----'.PHP_EOL
+          .chunk_split($cert, 64, PHP_EOL)
+          .'-----END CERTIFICATE-----'.PHP_EOL;
+  }
+
     protected static function decodeJWT($encUser)
     {
         require_once JWT_AUTH_PLUGIN_DIR . 'lib/php-jwt/Exceptions/BeforeValidException.php';
@@ -105,9 +143,13 @@ class JWT_AUTH_UserProcessor {
 
         $aud = JWT_AUTH_Options::get( 'aud' );
         $secret = JWT_AUTH_Options::get( 'secret' );
+        $domain = JWT_AUTH_Options::get( 'domain' );
         $secret_base64_encoded = JWT_AUTH_Options::get( 'secret_base64_encoded' );
         $secret_type = JWT_AUTH_Options::get( 'signing_algorithm' );
-        
+
+        if ( $secret_type === 'RS256' ){
+            $secret = self::JWKfetch($domain);
+        }
         if ($secret_base64_encoded) {
             $secret = base64_decode(strtr($secret, '-_', '+/'));
         }
