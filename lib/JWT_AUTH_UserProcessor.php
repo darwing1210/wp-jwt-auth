@@ -96,12 +96,16 @@ class JWT_AUTH_UserProcessor {
         return $user;
     }
 
-  public static function JWKfetch($domain){
+    public static function JWKfetch($domain) {
 
         global $wp_json_basic_auth_error;
         $wp_json_basic_auth_error = null;
 
+        $cache_expiration = JWT_AUTH_Options::get('cache_expiration');
+
         $endpoint = "https://$domain/.well-known/jwks.json";
+
+        if ( false === ($secret = get_transient('WP_Auth0_JWKS_cache') ) ) {
 
         $secret = [];
 
@@ -126,13 +130,18 @@ class JWT_AUTH_UserProcessor {
             foreach ($jwks['keys'] as $key) { 
                 $secret[$key['kid']] = self::convertCertToPem($key['x5c'][0]);
             }
-         return $secret;
+            if ($cache_expiration !== 0) {
+                set_transient( 'WP_Auth0_JWKS_cache', $secret, $cache_expiration * MINUTE_IN_SECONDS );
+            }
+        }
+        return $secret;
     }
-  protected function convertCertToPem($cert) {
+
+    protected function convertCertToPem($cert) {
       return '-----BEGIN CERTIFICATE-----'.PHP_EOL
           .chunk_split($cert, 64, PHP_EOL)
           .'-----END CERTIFICATE-----'.PHP_EOL;
-  }
+    }
 
     protected static function decodeJWT($encUser)
     {

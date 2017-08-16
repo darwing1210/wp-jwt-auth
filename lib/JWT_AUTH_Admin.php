@@ -51,7 +51,8 @@ class JWT_AUTH_Admin{
             array('id' => 'jwt_auth_aud', 'name' => 'Aud', 'function' => 'render_aud'),
             array('id' => 'jwt_auth_secret', 'name' => 'Secret', 'function' => 'render_secret'),
             array('id' => 'jwt_auth_secret_base64_encoded', 'name' => 'Base64 Secret encoded', 'function' => 'render_secret_base64_encoded'),
-            array('id' => 'jwt_auth_signing_algorithm', 'name' => 'Signing algorithm', 'function' => 'render_signing_algorithm'),
+            array('id' => 'jwt_auth_signing_algorithm', 'name' => 'Signing algorithm', 'function' => 'render_signing_algorithm'),           
+            array('id' => 'jwt_auth_cache_expiration', 'name' => 'Cache expiration', 'function' => 'render_cache_expiration'),
             array('id' => 'jwt_auth_domain', 'name' => 'domain', 'function' => 'render_domain'),
             array('id' => 'jwt_auth_user_property', 'name' => 'User Property', 'function' => 'render_user_property'),
             array('id' => 'jwt_auth_jwt_attribute', 'name' => 'JWT Attribute', 'function' => 'render_jwt_attribute'),
@@ -87,10 +88,15 @@ class JWT_AUTH_Admin{
         echo    '<option value="RS256" '.($v === "RS256" ? 'selected' : '').'>RS256</option>';
         echo '</select>';
     }
+    public static function render_cache_expiration(){
+        $v = JWT_AUTH_Options::get( 'cache_expiration' );
+        echo '<input type="number" name="' . JWT_AUTH_Options::OPTIONS_NAME . '[cache_expiration]" value="' . esc_attr( $v ) . '" id="jwt_auth_cache_expiration"/>';
+        echo '<br/><span class="description">' . __('Cache expiration in minutes for JWK. Not required for HS256 signing.', JWT_AUTH_LANG) . '</span>';
+    }
      public static function render_domain(){
         $v = JWT_AUTH_Options::get( 'domain' );
         echo '<input type="text" name="' . JWT_AUTH_Options::OPTIONS_NAME . '[domain]" value="' . esc_attr( $v ) . '" id="jwt_auth_domain"/>';
-        echo '<br/><span class="description">' . __('Domain (issuer) of the JWT. Not necessary for HS256 signing.', JWT_AUTH_LANG) . '</span>';
+        echo '<br/><span class="description">' . __('Domain (issuer) of the JWT. Not required for HS256 signing.', JWT_AUTH_LANG) . '</span>';
     }
     public static function render_user_property(){
         $v = JWT_AUTH_Options::get( 'user_property' );
